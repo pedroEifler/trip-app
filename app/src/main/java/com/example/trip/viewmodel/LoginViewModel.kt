@@ -15,8 +15,4 @@ class LoginViewModel : ViewModel() {
     fun onPasswordChange(value: String) {
         password.value = value
     }
-
-    fun onLoginClick() {
-        println("Login: ${email.value} / ${password.value}")
-    }
 }

@@ -24,7 +24,12 @@ import com.example.trip.ui.components.PasswordField
 import com.example.trip.viewmodel.LoginViewModel
 
 @Composable
-fun LoginScreen(vm: LoginViewModel = viewModel()) {
+fun LoginScreen(
+    onNavigateToRegister: () -> Unit,
+    onNavigateToForgotPassword: () -> Unit,
+    onLogin: () -> Unit,
+    vm: LoginViewModel = viewModel()
+) {
 
     Column(
         modifier = Modifier
@@ -59,7 +64,7 @@ fun LoginScreen(vm: LoginViewModel = viewModel()) {
         Spacer(modifier = Modifier.height(16.dp))
 
         LoginButton(
-            onClick = vm::onLoginClick
+            onClick = onLogin
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -72,14 +77,14 @@ fun LoginScreen(vm: LoginViewModel = viewModel()) {
             Text(
                 text = "Novo usuário",
                 modifier = Modifier.clickable {
-                    println("Novo usuário")
+                    onNavigateToRegister()
                 }
             )
 
             Text(
                 text = "Esqueci a senha",
                 modifier = Modifier.clickable {
-                    println("Esqueci a senha")
+                    onNavigateToForgotPassword()
                 }
             )
         }
