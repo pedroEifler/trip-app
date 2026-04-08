@@ -3,6 +3,7 @@ package com.example.trip.viewmodel
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import android.util.Patterns
+import com.example.trip.util.validateEmail
 
 class ForgotPasswordViewModel : ViewModel() {
 
@@ -14,14 +15,9 @@ class ForgotPasswordViewModel : ViewModel() {
     }
 
     private fun validate(): Boolean {
-
-        if (email.value.isBlank()) {
-            errorMessage.value = "Informe o e-mail"
-            return false
-        }
-
-        if (!Patterns.EMAIL_ADDRESS.matcher(email.value).matches()) {
-            errorMessage.value = "E-mail inválido"
+        val emailError = validateEmail(email.value)
+        if (emailError != null) {
+            errorMessage.value = emailError
             return false
         }
 

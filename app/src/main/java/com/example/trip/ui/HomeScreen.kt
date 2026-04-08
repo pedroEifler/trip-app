@@ -13,6 +13,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun HomeScreen(
+    email: String,
+    password: String,
     onSignOut: () -> Unit,
 ) {
     Column(
@@ -21,9 +23,9 @@ fun HomeScreen(
             .padding(24.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "Home"
-        )
+        Text(text = "Home")
+        Text(text = "E-mail: $email")
+        Text(text = "Senha: $password")
         Button(
             onClick = onSignOut,
             modifier = Modifier.fillMaxWidth()

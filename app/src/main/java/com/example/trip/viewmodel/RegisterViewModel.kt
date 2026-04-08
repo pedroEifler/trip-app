@@ -2,6 +2,7 @@ package com.example.trip.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.example.trip.util.validateEmail
 
 class RegisterViewModel : ViewModel() {
 
@@ -23,6 +24,12 @@ class RegisterViewModel : ViewModel() {
             confirmPassword.value.isBlank()
         ) {
             errorMessage.value = "Preencha todos os campos"
+            return false
+        }
+
+        val emailError = validateEmail(email.value)
+        if (emailError != null) {
+            errorMessage.value = emailError
             return false
         }
 

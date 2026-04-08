@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,7 +28,7 @@ import com.example.trip.viewmodel.LoginViewModel
 fun LoginScreen(
     onNavigateToRegister: () -> Unit,
     onNavigateToForgotPassword: () -> Unit,
-    onLogin: () -> Unit,
+    onLogin: (email: String, password: String) -> Unit,
     vm: LoginViewModel = viewModel()
 ) {
 
@@ -63,8 +64,13 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        vm.errorMessage.value?.let {
+            Text(text = it, color = MaterialTheme.colorScheme.error)
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
         LoginButton(
-            onClick = onLogin
+            onClick = { vm.onLogin(onLogin) }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
