@@ -11,15 +11,21 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import com.example.trip.data.repository.UserRepository
 import com.example.trip.ui.ForgotPasswordScreen
 import com.example.trip.ui.HomeScreen
 import com.example.trip.ui.LoginScreen
 import com.example.trip.ui.RegisterScreen
 import com.example.trip.ui.theme.TripTheme
+import com.example.trip.viewmodel.ForgotPasswordViewModel
+import com.example.trip.viewmodel.LoginViewModel
+import com.example.trip.viewmodel.RegisterViewModel
 import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {
@@ -53,6 +59,9 @@ data class Home(val email: String, val password: String) : NavKey
 @Composable
 fun AppNavigation() {
     val backStack = rememberNavBackStack(Login)
+    val context = LocalContext.current
+    val app = context.applicationContext as TripApplication
+    val userRepository: UserRepository = app.userRepository
 
     NavDisplay(
         backStack = backStack,
@@ -60,19 +69,35 @@ fun AppNavigation() {
         entryProvider = { key: NavKey ->
             when (key) {
                 is Login -> NavEntry(key) {
+                    val loginVm: LoginViewModel = viewModel(
+                        factory = LoginViewModel.provideFactory(userRepository)
+                    )
                     LoginScreen(
                         onNavigateToRegister = { backStack.add(Register) },
                         onNavigateToForgotPassword = { backStack.add(ForgotPassword) },
-                        onLogin = { email: String, password: String -> backStack.add(Home(email, password)) }
+                        onLogin = { email: String, password: String -> backStack.add(Home(email, password)) },
+                        vm = loginVm
                     )
                 }
 
                 is Register -> NavEntry(key) {
-                    RegisterScreen({ backStack.add(Login) })
+                    val registerVm: RegisterViewModel = viewModel(
+                        factory = RegisterViewModel.provideFactory(userRepository)
+                    )
+                    RegisterScreen(
+                        onNavigateBack = { backStack.add(Login) },
+                        vm = registerVm
+                    )
                 }
 
                 is ForgotPassword -> NavEntry(key) {
-                    ForgotPasswordScreen({ backStack.add(Login) })
+                    val forgotVm: ForgotPasswordViewModel = viewModel(
+                        factory = ForgotPasswordViewModel.provideFactory(userRepository)
+                    )
+                    ForgotPasswordScreen(
+                        onNavigateBack = { backStack.add(Login) },
+                        vm = forgotVm
+                    )
                 }
 
                 is Home -> NavEntry(key) {

@@ -16,7 +16,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 @Composable
 fun PasswordField(
     value: String,
-    onChange: (String) -> Unit
+    onChange: (String) -> Unit,
+    label: String = "Senha"
 ) {
 
     var passwordVisible by remember { mutableStateOf(false) }
@@ -24,7 +25,7 @@ fun PasswordField(
     OutlinedTextField(
         value = value,
         onValueChange = onChange,
-        label = { Text("Senha") },
+        label = { Text(label) },
         modifier = Modifier.fillMaxWidth(),
 
         visualTransformation = if (passwordVisible)

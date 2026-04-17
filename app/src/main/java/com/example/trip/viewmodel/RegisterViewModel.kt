@@ -2,9 +2,13 @@ package com.example.trip.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.example.trip.data.repository.UserRepository
 import com.example.trip.util.validateEmail
+import kotlinx.coroutines.launch
 
-class RegisterViewModel : ViewModel() {
+class RegisterViewModel(private val repository: UserRepository) : ViewModel() {
 
     var name = mutableStateOf("")
     var email = mutableStateOf("")
@@ -13,9 +17,10 @@ class RegisterViewModel : ViewModel() {
     var confirmPassword = mutableStateOf("")
 
     var errorMessage = mutableStateOf<String?>(null)
+    var isLoading = mutableStateOf(false)
+    var successMessage = mutableStateOf<String?>(null)
 
-    fun validate(): Boolean {
-
+    private fun validate(): Boolean {
         if (
             name.value.isBlank() ||
             email.value.isBlank() ||
@@ -43,8 +48,29 @@ class RegisterViewModel : ViewModel() {
     }
 
     fun onRegister(onSuccess: () -> Unit) {
-        if (validate()) {
-            onSuccess()
+        if (!validate()) return
+
+        isLoading.value = true
+        viewModelScope.launch {
+            when (val result = repository.register(
+                name = name.value,
+                email = email.value,
+                phone = phone.value,
+                password = password.value
+            )) {
+                is UserRepository.RegisterResult.Success -> {
+                    errorMessage.value = null
+                    successMessage.value = "Registro bem-sucedido!"
+                    onSuccess()
+                }
+                is UserRepository.RegisterResult.EmailAlreadyExists -> {
+                    errorMessage.value = "Este e-mail já está cadastrado"
+                }
+                is UserRepository.RegisterResult.Error -> {
+                    errorMessage.value = result.message
+                }
+            }
+            isLoading.value = false
         }
     }
 
@@ -68,4 +94,14 @@ class RegisterViewModel : ViewModel() {
         confirmPassword.value = value
     }
 
+    companion object {
+        fun provideFactory(repository: UserRepository): ViewModelProvider.Factory {
+            return object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return RegisterViewModel(repository) as T
+                }
+            }
+        }
+    }
 }
