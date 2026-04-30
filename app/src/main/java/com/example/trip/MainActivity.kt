@@ -18,6 +18,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import com.example.trip.data.repository.TripRepository
 import com.example.trip.data.repository.UserRepository
 import com.example.trip.ui.AboutScreen
 import com.example.trip.ui.ForgotPasswordScreen
@@ -29,6 +30,8 @@ import com.example.trip.ui.RegisterScreen
 import com.example.trip.ui.theme.TripTheme
 import com.example.trip.viewmodel.ForgotPasswordViewModel
 import com.example.trip.viewmodel.LoginViewModel
+import com.example.trip.viewmodel.MyTripsViewModel
+import com.example.trip.viewmodel.NewTripViewModel
 import com.example.trip.viewmodel.RegisterViewModel
 import kotlinx.serialization.Serializable
 
@@ -61,13 +64,16 @@ data object ForgotPassword : NavKey
 data class Home(val email: String, val password: String) : NavKey
 
 @Serializable
-data object NewTrip : NavKey
+data class NewTrip(val email: String) : NavKey
 
 @Serializable
-data object MyTrips : NavKey
+data class MyTrips(val email: String) : NavKey
 
 @Serializable
 data object About : NavKey
+
+@Serializable
+data class EditTrip(val email: String, val tripId: Long) : NavKey
 
 @Composable
 fun AppNavigation(onExitApp: () -> Unit) {
@@ -75,6 +81,7 @@ fun AppNavigation(onExitApp: () -> Unit) {
     val context = LocalContext.current
     val app = context.applicationContext as TripApplication
     val userRepository: UserRepository = app.userRepository
+    val tripRepository: TripRepository = app.tripRepository
 
     NavDisplay(
         backStack = backStack,
@@ -114,27 +121,44 @@ fun AppNavigation(onExitApp: () -> Unit) {
                 }
 
                 is Home -> NavEntry(key) {
-                    // BackHandler para encerrar o app quando estiver na Home e pressionar voltar
-                    BackHandler {
-                        onExitApp()
-                    }
+                    BackHandler { onExitApp() }
                     HomeScreen(
                         email = key.email,
                         onSignOut = { backStack.removeLastOrNull() },
-                        onNavigateToNewTrip = { backStack.add(NewTrip) },
-                        onNavigateToMyTrips = { backStack.add(MyTrips) },
+                        onNavigateToNewTrip = { backStack.add(NewTrip(key.email)) },
+                        onNavigateToMyTrips = { backStack.add(MyTrips(key.email)) },
                         onNavigateToAbout = { backStack.add(About) }
                     )
                 }
 
                 is NewTrip -> NavEntry(key) {
+                    val newTripVm: NewTripViewModel = viewModel(
+                        factory = NewTripViewModel.provideFactory(tripRepository, userRepository, key.email)
+                    )
                     NewTripScreen(
+                        vm = newTripVm,
                         onNavigateBack = { backStack.removeLastOrNull() }
                     )
                 }
 
                 is MyTrips -> NavEntry(key) {
+                    val myTripsVm: MyTripsViewModel = viewModel(
+                        factory = MyTripsViewModel.provideFactory(tripRepository, userRepository, key.email)
+                    )
                     MyTripsScreen(
+                        vm = myTripsVm,
+                        onNavigateBack = { backStack.removeLastOrNull() },
+                        onEditTrip = { tripId -> backStack.add(EditTrip(key.email, tripId)) }
+                    )
+                }
+
+                is EditTrip -> NavEntry(key) {
+                    val editVm: NewTripViewModel = viewModel(
+                        key = "edit_trip_${key.tripId}",
+                        factory = NewTripViewModel.provideFactory(tripRepository, userRepository, key.email, key.tripId)
+                    )
+                    NewTripScreen(
+                        vm = editVm,
                         onNavigateBack = { backStack.removeLastOrNull() }
                     )
                 }

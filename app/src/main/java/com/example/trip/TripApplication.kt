@@ -2,6 +2,7 @@ package com.example.trip
 
 import android.app.Application
 import com.example.trip.data.local.AppDatabase
+import com.example.trip.data.repository.TripRepository
 import com.example.trip.data.repository.UserRepository
 
 class TripApplication : Application() {
@@ -12,6 +13,10 @@ class TripApplication : Application() {
 
     val userRepository: UserRepository by lazy {
         UserRepository(database.userDao())
+    }
+
+    val tripRepository: TripRepository by lazy {
+        TripRepository(database.tripDao())
     }
 }
 

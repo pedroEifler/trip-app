@@ -25,17 +25,17 @@ sealed class DrawerMenuItem(
     val icon: @Composable () -> Unit
 ) {
     data object NewTrip : DrawerMenuItem(
-        title = "Nova viagem ✈️",
+        title = "Nova viagem",
         icon = { Icon(Icons.Default.FlightTakeoff, contentDescription = "Nova viagem") }
     )
     
     data object MyTrips : DrawerMenuItem(
-        title = "Minhas Viagens 🧳",
+        title = "Minhas Viagens",
         icon = { Icon(Icons.Default.Luggage, contentDescription = "Minhas Viagens") }
     )
     
     data object About : DrawerMenuItem(
-        title = "Sobre ℹ️",
+        title = "Sobre",
         icon = { Icon(Icons.Default.Info, contentDescription = "Sobre") }
     )
 }

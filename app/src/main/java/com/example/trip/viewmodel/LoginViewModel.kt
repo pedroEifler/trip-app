@@ -10,8 +10,8 @@ import kotlinx.coroutines.launch
 
 class LoginViewModel(private val repository: UserRepository) : ViewModel() {
 
-    var email = mutableStateOf("")
-    var password = mutableStateOf("")
+    var email = mutableStateOf("pedro@gmail.com")
+    var password = mutableStateOf("123")
     var errorMessage = mutableStateOf<String?>(null)
     var isLoading = mutableStateOf(false)
 
