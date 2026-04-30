@@ -2,6 +2,7 @@ package com.example.trip
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
@@ -18,9 +19,12 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.trip.data.repository.UserRepository
+import com.example.trip.ui.AboutScreen
 import com.example.trip.ui.ForgotPasswordScreen
 import com.example.trip.ui.HomeScreen
 import com.example.trip.ui.LoginScreen
+import com.example.trip.ui.MyTripsScreen
+import com.example.trip.ui.NewTripScreen
 import com.example.trip.ui.RegisterScreen
 import com.example.trip.ui.theme.TripTheme
 import com.example.trip.viewmodel.ForgotPasswordViewModel
@@ -36,7 +40,7 @@ class MainActivity : ComponentActivity() {
             TripTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
-                        AppNavigation()
+                        AppNavigation(onExitApp = { finish() })
                     }
                 }
             }
@@ -56,8 +60,17 @@ data object ForgotPassword : NavKey
 @Serializable
 data class Home(val email: String, val password: String) : NavKey
 
+@Serializable
+data object NewTrip : NavKey
+
+@Serializable
+data object MyTrips : NavKey
+
+@Serializable
+data object About : NavKey
+
 @Composable
-fun AppNavigation() {
+fun AppNavigation(onExitApp: () -> Unit) {
     val backStack = rememberNavBackStack(Login)
     val context = LocalContext.current
     val app = context.applicationContext as TripApplication
@@ -101,10 +114,34 @@ fun AppNavigation() {
                 }
 
                 is Home -> NavEntry(key) {
+                    // BackHandler para encerrar o app quando estiver na Home e pressionar voltar
+                    BackHandler {
+                        onExitApp()
+                    }
                     HomeScreen(
                         email = key.email,
-                        password = key.password,
-                        onSignOut = { backStack.removeLastOrNull() }
+                        onSignOut = { backStack.removeLastOrNull() },
+                        onNavigateToNewTrip = { backStack.add(NewTrip) },
+                        onNavigateToMyTrips = { backStack.add(MyTrips) },
+                        onNavigateToAbout = { backStack.add(About) }
+                    )
+                }
+
+                is NewTrip -> NavEntry(key) {
+                    NewTripScreen(
+                        onNavigateBack = { backStack.removeLastOrNull() }
+                    )
+                }
+
+                is MyTrips -> NavEntry(key) {
+                    MyTripsScreen(
+                        onNavigateBack = { backStack.removeLastOrNull() }
+                    )
+                }
+
+                is About -> NavEntry(key) {
+                    AboutScreen(
+                        onNavigateBack = { backStack.removeLastOrNull() }
                     )
                 }
 
