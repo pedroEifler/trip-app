@@ -17,6 +17,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -34,6 +37,8 @@ fun LoginScreen(
     vm: LoginViewModel
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
+        val isDark = isSystemInDarkTheme()
+        val planeColor = if (isDark) Color.White else Color.Black
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -42,12 +47,14 @@ fun LoginScreen(
         ) {
 
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                painter = painterResource(id = R.drawable.aviao),
                 contentDescription = "Imagem viagem",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Fit,
+                alignment = Alignment.Center,
+                colorFilter = ColorFilter.tint(planeColor)
             )
 
             Spacer(modifier = Modifier.height(24.dp))

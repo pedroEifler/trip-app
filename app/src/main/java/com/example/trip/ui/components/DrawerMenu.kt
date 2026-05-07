@@ -57,7 +57,7 @@ fun DrawerMenu(
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 Text(
-                    text = "Menu 🏠",
+                    text = "Menu",
                     modifier = Modifier.padding(horizontal = 28.dp, vertical = 16.dp),
                     style = androidx.compose.material3.MaterialTheme.typography.titleLarge
                 )
