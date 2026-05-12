@@ -72,5 +72,10 @@ class TripRepository(private val tripDao: TripDao) {
     fun getByUser(userId: Long): Flow<List<TripEntity>> = tripDao.getByUser(userId)
 
     fun getAll(): Flow<List<TripEntity>> = tripDao.getAll()
+
+    suspend fun findCurrentTripByCity(userId: Long, city: String): TripEntity? {
+        val now = System.currentTimeMillis()
+        return tripDao.findCurrentTripByCity(userId, city, now)
+    }
 }
 

@@ -29,6 +29,7 @@ import com.example.trip.ui.NewTripScreen
 import com.example.trip.ui.RegisterScreen
 import com.example.trip.ui.theme.TripTheme
 import com.example.trip.viewmodel.ForgotPasswordViewModel
+import com.example.trip.viewmodel.HomeViewModel
 import com.example.trip.viewmodel.LoginViewModel
 import com.example.trip.viewmodel.MyTripsViewModel
 import com.example.trip.viewmodel.NewTripViewModel
@@ -122,8 +123,12 @@ fun AppNavigation(onExitApp: () -> Unit) {
 
                 is Home -> NavEntry(key) {
                     BackHandler { onExitApp() }
+                    val homeVm: HomeViewModel = viewModel(
+                        factory = HomeViewModel.provideFactory(key.email, context, tripRepository, userRepository)
+                    )
                     HomeScreen(
                         email = key.email,
+                        vm = homeVm,
                         onSignOut = { backStack.removeLastOrNull() },
                         onNavigateToNewTrip = { backStack.add(NewTrip(key.email)) },
                         onNavigateToMyTrips = { backStack.add(MyTrips(key.email)) },
