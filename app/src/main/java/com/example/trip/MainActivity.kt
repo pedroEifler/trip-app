@@ -18,6 +18,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import com.example.trip.data.repository.PhotoRepository
 import com.example.trip.data.repository.TripRepository
 import com.example.trip.data.repository.UserRepository
 import com.example.trip.ui.AboutScreen
@@ -26,13 +27,16 @@ import com.example.trip.ui.HomeScreen
 import com.example.trip.ui.LoginScreen
 import com.example.trip.ui.MyTripsScreen
 import com.example.trip.ui.NewTripScreen
+import com.example.trip.ui.PhotosScreen
 import com.example.trip.ui.RegisterScreen
+import com.example.trip.ui.RoteiroScreen
 import com.example.trip.ui.theme.TripTheme
 import com.example.trip.viewmodel.ForgotPasswordViewModel
 import com.example.trip.viewmodel.HomeViewModel
 import com.example.trip.viewmodel.LoginViewModel
 import com.example.trip.viewmodel.MyTripsViewModel
 import com.example.trip.viewmodel.NewTripViewModel
+import com.example.trip.viewmodel.PhotosViewModel
 import com.example.trip.viewmodel.RegisterViewModel
 import kotlinx.serialization.Serializable
 
@@ -76,6 +80,12 @@ data object About : NavKey
 @Serializable
 data class EditTrip(val email: String, val tripId: Long) : NavKey
 
+@Serializable
+data class Photos(val email: String, val tripId: Long, val destination: String) : NavKey
+
+@Serializable
+data class Roteiro(val email: String) : NavKey
+
 @Composable
 fun AppNavigation(onExitApp: () -> Unit) {
     val backStack = rememberNavBackStack(Login)
@@ -83,6 +93,7 @@ fun AppNavigation(onExitApp: () -> Unit) {
     val app = context.applicationContext as TripApplication
     val userRepository: UserRepository = app.userRepository
     val tripRepository: TripRepository = app.tripRepository
+    val photoRepository: PhotoRepository = app.photoRepository
 
     NavDisplay(
         backStack = backStack,
@@ -132,7 +143,11 @@ fun AppNavigation(onExitApp: () -> Unit) {
                         onSignOut = { backStack.removeLastOrNull() },
                         onNavigateToNewTrip = { backStack.add(NewTrip(key.email)) },
                         onNavigateToMyTrips = { backStack.add(MyTrips(key.email)) },
-                        onNavigateToAbout = { backStack.add(About) }
+                        onNavigateToAbout = { backStack.add(About) },
+                        onNavigateToPhotos = { tripId, destination ->
+                            backStack.add(Photos(key.email, tripId, destination))
+                        },
+                        onNavigateToRoteiro = { backStack.add(Roteiro(key.email)) }
                     )
                 }
 
@@ -170,6 +185,24 @@ fun AppNavigation(onExitApp: () -> Unit) {
 
                 is About -> NavEntry(key) {
                     AboutScreen(
+                        onNavigateBack = { backStack.removeLastOrNull() }
+                    )
+                }
+
+                is Photos -> NavEntry(key) {
+                    val photosVm: PhotosViewModel = viewModel(
+                        key = "photos_${key.tripId}",
+                        factory = PhotosViewModel.provideFactory(photoRepository, key.tripId)
+                    )
+                    PhotosScreen(
+                        vm = photosVm,
+                        tripDestination = key.destination,
+                        onNavigateBack = { backStack.removeLastOrNull() }
+                    )
+                }
+
+                is Roteiro -> NavEntry(key) {
+                    RoteiroScreen(
                         onNavigateBack = { backStack.removeLastOrNull() }
                     )
                 }

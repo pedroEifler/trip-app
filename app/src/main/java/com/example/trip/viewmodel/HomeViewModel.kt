@@ -22,6 +22,8 @@ import kotlinx.coroutines.launch
 data class HomeUiState(
     val email: String = "",
     val city: String? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
     val hasPermission: Boolean = false,
     val isLoadingLocation: Boolean = false,
     val currentTrip: TripEntity? = null,
@@ -58,7 +60,14 @@ class HomeViewModel(
                 .catch { _uiState.update { s -> s.copy(isLoadingLocation = false, locationError = "Erro ao obter localização") } }
                 .collect { locationInfo ->
                     val city = locationInfo.city
-                    _uiState.update { it.copy(city = city, isLoadingLocation = false) }
+                    _uiState.update {
+                        it.copy(
+                            city = city,
+                            latitude = locationInfo.latitude,
+                            longitude = locationInfo.longitude,
+                            isLoadingLocation = false
+                        )
+                    }
                     if (city != null) {
                         searchTripForCity(city)
                     }

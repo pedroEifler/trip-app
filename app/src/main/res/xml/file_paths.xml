@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Maps to context.getFilesDir()/trip_photos used to store captured photos. -->
+    <files-path
+        name="trip_photos"
+        path="trip_photos/" />
+</paths>
+

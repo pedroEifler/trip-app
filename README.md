@@ -11,10 +11,12 @@ Aplicativo Android para gerenciamento de viagens pessoais, desenvolvido com **Je
 | **Login** | Autenticação com e-mail e senha |
 | **Cadastro** | Criação de nova conta de usuário |
 | **Esqueci a senha** | Redefinição de senha por e-mail |
-| **Home** | Menu principal com DrawerMenu lateral |
+| **Home** | Menu principal com DrawerMenu lateral, mapa da viagem corrente e Bottom Bar |
 | **Nova Viagem** | Formulário para cadastrar uma viagem |
 | **Minhas Viagens** | Lista de viagens do usuário logado |
 | **Editar Viagem** | Formulário pré-preenchido para edição |
+| **Fotos** | Galeria de fotos da viagem corrente (câmera/galeria) |
+| **Roteiro** | Placeholder (será implementado em outra tarefa) |
 | **Sobre** | Informações do aplicativo |
 
 ---
@@ -40,6 +42,19 @@ Aplicativo Android para gerenciamento de viagens pessoais, desenvolvido com **Je
 - **Excluir** via swipe para a esquerda
 - Ícone diferenciado por tipo: 🏖️ Lazer / 💼 Negócios
 - Dados pré-cadastrados inseridos via migration
+
+### Viagem Corrente (Home)
+- Detecção automática da viagem em andamento pela cidade atual (geolocalização) e datas
+- 🗺️ **Mapa** (Google Maps) com a localização atual da viagem
+- **Bottom Bar** com as opções **Roteiro** e **Fotos**
+  - **Roteiro** — placeholder (implementação em outra tarefa)
+  - **Fotos** — habilitada apenas quando há viagem corrente
+
+### Fotos da Viagem
+- Galeria de todas as fotos vinculadas à viagem corrente (grade)
+- Adicionar foto pela **Câmera** (FileProvider) ou pela **Galeria** (Photo Picker)
+- Fotos copiadas para o armazenamento interno e vinculadas à viagem no banco
+- Remover foto via long press
 
 ---
 
@@ -119,10 +134,19 @@ app/src/main/java/com/example/trip/
 | `description` | String | Descrição |
 | `userId` | Long | FK para o usuário |
 
+#### `photos`
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `id` | Long (PK) | Auto gerado |
+| `tripId` | Long | FK para a viagem (ON DELETE CASCADE) |
+| `filePath` | String | Caminho do arquivo no armazenamento interno |
+| `createdAt` | Long | Data de criação (epoch ms) |
+
 ### Migrations
 | Versão | Mudança |
 |---|---|
 | `v1 → v2` | Criação da tabela `trips` + 3 registros pré-cadastrados |
+| `v2 → v3` | Criação da tabela `photos` (FK para `trips`) |
 
 ---
 
@@ -149,6 +173,8 @@ Login → Register
       → Home → NewTrip(email)
              → MyTrips(email) → EditTrip(email, tripId)
              → About
+             → Photos(email, tripId, destination)
+             → Roteiro(email)
 ```
 
 ---
@@ -166,6 +192,10 @@ Login → Register
 | kotlinx.serialization | 1.9.0 | Serialização dos NavKeys |
 | Lifecycle ViewModel | 2.10.0 | ViewModels + coroutines |
 | Material Icons Extended | 1.6.0 | Ícones Material |
+| Maps Compose | 4.4.1 | Mapa da viagem corrente |
+| Play Services Maps | 18.2.0 | SDK do Google Maps |
+| Play Services Location | 21.3.0 | Localização (cidade atual) |
+| Coil Compose | 2.7.0 | Carregamento de imagens (fotos) |
 
 ---
 
@@ -187,9 +217,18 @@ Login → Register
 
 2. Abra no **Android Studio**
 
-3. Aguarde a sincronização do Gradle
+3. Configure a **chave da API do Google Maps** no arquivo `local.properties`
+   (necessária para exibir o mapa da viagem corrente):
+   ```properties
+   MAPS_API_KEY=suachaveaqui
+   ```
+   > Crie a chave no [Google Cloud Console](https://console.cloud.google.com/)
+   > habilitando o serviço **Maps SDK for Android**. A chave é injetada no
+   > `AndroidManifest.xml` via `manifestPlaceholders` durante o build.
 
-4. Execute em um emulador ou dispositivo físico (API 24+)
+4. Aguarde a sincronização do Gradle
+
+5. Execute em um emulador ou dispositivo físico (API 24+)
 
 ---
 

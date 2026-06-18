@@ -9,12 +9,14 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.trip.data.local.dao.TripDao
 import com.example.trip.data.local.dao.UserDao
+import com.example.trip.data.local.dao.PhotoDao
 import com.example.trip.data.local.entity.TripEntity
 import com.example.trip.data.local.entity.UserEntity
+import com.example.trip.data.local.entity.PhotoEntity
 
 @Database(
-    entities = [UserEntity::class, TripEntity::class],
-    version = 2,
+    entities = [UserEntity::class, TripEntity::class, PhotoEntity::class],
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(TripTypeConverter::class)
@@ -22,12 +24,12 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
     abstract fun tripDao(): TripDao
+    abstract fun photoDao(): PhotoDao
 
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        // Migração de v1 para v2: cria a tabela trips e insere registros pré-cadastrados
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
@@ -44,7 +46,6 @@ abstract class AppDatabase : RoomDatabase() {
                     )
                     """.trimIndent()
                 )
-                // Registros pré-cadastrados (userId = 1 — primeiro usuário)
                 db.execSQL(
                     """
                     INSERT INTO trips (destination, type, startDate, endDate, budget, description, userId)
@@ -57,6 +58,23 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS photos (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        tripId INTEGER NOT NULL,
+                        filePath TEXT NOT NULL,
+                        createdAt INTEGER NOT NULL,
+                        FOREIGN KEY(tripId) REFERENCES trips(id) ON DELETE CASCADE
+                    )
+                    """.trimIndent()
+                )
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_photos_tripId ON photos(tripId)")
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -64,7 +82,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "trip_database"
                 )
-                    .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .build()
                 INSTANCE = instance
                 instance
