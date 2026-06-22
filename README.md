@@ -217,18 +217,11 @@ Login → Register
 
 2. Abra no **Android Studio**
 
-3. Configure a **chave da API do Google Maps** no arquivo `local.properties`
-   (necessária para exibir o mapa da viagem corrente):
-   ```properties
-   MAPS_API_KEY=suachaveaqui
-   ```
-   > Crie a chave no [Google Cloud Console](https://console.cloud.google.com/)
-   > habilitando o serviço **Maps SDK for Android**. A chave é injetada no
-   > `AndroidManifest.xml` via `manifestPlaceholders` durante o build.
+3. Aguarde a sincronização do Gradle
 
-4. Aguarde a sincronização do Gradle
-
-5. Execute em um emulador ou dispositivo físico (API 24+)
+4. Execute em um emulador ou dispositivo físico (API 24+)
+   > O mapa da viagem corrente abre no app do **Google Maps** por meio de um *Intent* (`geo:`),
+   > portanto **não é necessária nenhuma chave de API**.
 
 ---
 
