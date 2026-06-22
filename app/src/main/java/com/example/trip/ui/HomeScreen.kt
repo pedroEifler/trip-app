@@ -166,15 +166,17 @@ fun HomeScreen(
                         }
                     } else if (uiState.city != null) {
                         Text(text = "📍 Cidade atual: ${uiState.city}")
-                        Spacer(modifier = Modifier.height(4.dp))
-                        if (uiState.currentTrip != null) {
-                            CurrentTripCard(trip = uiState.currentTrip!!, totalExpenses = uiState.totalExpenses)
-                            if (uiState.latitude != null && uiState.longitude != null) {
-                                Spacer(modifier = Modifier.height(8.dp))
+                        val currentTrip = uiState.currentTrip
+                        if (currentTrip != null) {
+                            CurrentTripCard(trip = currentTrip, totalExpenses = uiState.totalExpenses)
+                            val latitude = uiState.latitude
+                            val longitude = uiState.longitude
+                            if (latitude != null && longitude != null) {
+                                // Opens the current trip location in Google Maps via a Maps Intent.
                                 CurrentTripMap(
-                                    latitude = uiState.latitude!!,
-                                    longitude = uiState.longitude!!,
-                                    title = uiState.currentTrip!!.destination
+                                    latitude = latitude,
+                                    longitude = longitude,
+                                    title = currentTrip.destination
                                 )
                             }
                         } else {

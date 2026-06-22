@@ -11,6 +11,15 @@
         android:name="android.hardware.camera"
         android:required="false" />
 
+    <!-- Allows launching the Google Maps app / geo: URIs via Maps Intents on API 30+. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="geo" />
+        </intent>
+        <package android:name="com.google.android.apps.maps" />
+    </queries>
+
     <application
         android:name=".TripApplication"
         android:allowBackup="true"
