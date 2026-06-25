@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -5,6 +7,25 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+// Reads the Google Maps API key from local.properties (not checked into VCS)
+val mapsApiKey: String = run {
+    val properties = Properties()
+    val localProperties = rootProject.file("local.properties")
+    if (localProperties.exists()) {
+        localProperties.inputStream().use { stream -> properties.load(stream) }
+    }
+    properties.getProperty("MAPS_API_KEY", "")
+}
+
+// Reads the Gemini API key from local.properties (not checked into VCS)
+val geminiApiKey: String = run {
+    val properties = Properties()
+    val localProperties = rootProject.file("local.properties")
+    if (localProperties.exists()) {
+        localProperties.inputStream().use { stream -> properties.load(stream) }
+    }
+    properties.getProperty("GEMINI_API_KEY", "")
+}
 
 android {
     namespace = "com.example.trip"
@@ -22,6 +43,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Injected into AndroidManifest.xml as ${MAPS_API_KEY}
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+
+        // Exposed via BuildConfig.GEMINI_API_KEY for the Gemini API client
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
     }
 
     buildTypes {
@@ -39,6 +66,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -61,7 +89,13 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.play.services.location)
     implementation(libs.accompanist.permissions)
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.maps)
     implementation(libs.coil.compose)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.kotlinx.serialization)
+    implementation(libs.okhttp.logging.interceptor)
+    implementation(libs.kotlinx.serialization.json)
     ksp(libs.androidx.room.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

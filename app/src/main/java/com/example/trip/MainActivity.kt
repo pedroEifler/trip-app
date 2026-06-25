@@ -19,6 +19,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.trip.data.repository.PhotoRepository
+import com.example.trip.data.repository.RoteiroRepository
 import com.example.trip.data.repository.TripRepository
 import com.example.trip.data.repository.UserRepository
 import com.example.trip.ui.AboutScreen
@@ -38,6 +39,7 @@ import com.example.trip.viewmodel.MyTripsViewModel
 import com.example.trip.viewmodel.NewTripViewModel
 import com.example.trip.viewmodel.PhotosViewModel
 import com.example.trip.viewmodel.RegisterViewModel
+import com.example.trip.viewmodel.RoteiroViewModel
 import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {
@@ -94,6 +96,7 @@ fun AppNavigation(onExitApp: () -> Unit) {
     val userRepository: UserRepository = app.userRepository
     val tripRepository: TripRepository = app.tripRepository
     val photoRepository: PhotoRepository = app.photoRepository
+    val roteiroRepository: RoteiroRepository = app.roteiroRepository
 
     NavDisplay(
         backStack = backStack,
@@ -202,7 +205,11 @@ fun AppNavigation(onExitApp: () -> Unit) {
                 }
 
                 is Roteiro -> NavEntry(key) {
+                    val roteiroVm: RoteiroViewModel = viewModel(
+                        factory = RoteiroViewModel.provideFactory(roteiroRepository)
+                    )
                     RoteiroScreen(
+                        vm = roteiroVm,
                         onNavigateBack = { backStack.removeLastOrNull() }
                     )
                 }
