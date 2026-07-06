@@ -48,7 +48,11 @@ UI (Compose Screens) ⇄ ViewModel (estado + lógica) ⇄ Repository ⇄ DAO/Roo
 
 ## 🖼️ Imagens do Projeto
 
+<img width="240" height="537" alt="Login" src="https://github.com/user-attachments/assets/865c96cf-5bf7-46f1-bf9c-a3a0eccc2a12" />
 
+<img width="240" height="537" alt="Home" src="https://github.com/user-attachments/assets/e43d6e41-b024-41a9-9c91-1344cf0cb849" />
+
+<img width="240" height="537" alt="Roteiro" src="https://github.com/user-attachments/assets/de24d3ed-4a80-4404-baa8-8c7d843f2444" />
 
 ---
 
